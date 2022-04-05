@@ -262,8 +262,8 @@ def setup(args):
     cfg.MIN_SIZE_TRAIN=(490,)
     cfg.SOLVER.CHECKPOINT_PERIOD=5000
     cfg.SOLVER.GAMMA = 0.8
-    cfg.DATASETS.TRAIN = ("coco_2017_train_stuff_10k_sem_seg",)
-    cfg.DATASETS.TEST = ("coco_2017_test_stuff_10k_sem_seg",)
+    cfg.DATASETS.TRAIN = ("training_dataset",)
+    cfg.DATASETS.TEST = ("validation_dataset",)
     cfg.MODEL.ROI_HEADS.NUM_CLASSES = 323
     cfg.SOLVER.STEPS = (10000,)
     cfg.TEST.EVAL_PERIOD = 10000
