@@ -182,7 +182,7 @@ COCO_CATEGORIES = [
 def _get_coco_stuff_meta():
     # Id 0 is reserved for ignore_label, we change ignore_label for 0
     # to 255 in our pre-processing.
-    stuff_ids = [k["id"] for k in COCO_CATEGORIES]
+    #stuff_ids = [k["id"] for k in COCO_CATEGORIES]
     assert len(stuff_ids) == 171, len(stuff_ids)
 
     # For semantic segmentation, this mapping maps from contiguous stuff id
@@ -198,25 +198,38 @@ def _get_coco_stuff_meta():
 
 
 def register_all_coco_stuff_10k(root):
-    root = os.path.join(root, "coco", "coco_stuff_10k")
-    meta = _get_coco_stuff_meta()
-    for name, image_dirname, sem_seg_dirname in [
-        ("train", "images_detectron2/train", "annotations_detectron2/train"),
-        ("test", "images_detectron2/test", "annotations_detectron2/test"),
-    ]:
-        image_dir = os.path.join(root, image_dirname)
-        gt_dir = os.path.join(root, sem_seg_dirname)
-        name = f"coco_2017_{name}_stuff_10k_sem_seg"
-        DatasetCatalog.register(
-            name, lambda x=image_dir, y=gt_dir: load_sem_seg(y, x, gt_ext="png", image_ext="jpg")
-        )
-        MetadataCatalog.get(name).set(
-            image_root=image_dir,
-            sem_seg_root=gt_dir,
-            evaluator_type="sem_seg",
-            ignore_label=255,
-            **meta,
-        )
+    train_annotations_path = '/content/data/train/new_ann.json'
+    train_images_path = '/content/data/train/images'
+
+    val_annotations_path = 'data/val/new_ann.json'
+    val_images_path = 'data/val/images'
+    register_coco_instances("training_dataset", {},train_annotations_path, train_images_path)
+    register_coco_instances("validation_dataset", {},val_annotations_path, VAL_IMAGE_DIRECTIORY)
+
+    MetadataCatalog.get("training_dataset")
+    DatasetCatalog.get("training_dataset")
+    # Create dataset_for_Val
+    MetadataCatalog.get("validation_dataset")
+    DatasetCatalog.get("validation_dataset")
+#     root = os.path.join(root, "coco", "coco_stuff_10k")
+#     meta = _get_coco_stuff_meta()
+#     for name, image_dirname, sem_seg_dirname in [
+#         ("train", "images_detectron2/train", "annotations_detectron2/train"),
+#         ("test", "images_detectron2/test", "annotations_detectron2/test"),
+#     ]:
+#         image_dir = os.path.join(root, image_dirname)
+#         gt_dir = os.path.join(root, sem_seg_dirname)
+#         name = f"coco_2017_{name}_stuff_10k_sem_seg"
+#         DatasetCatalog.register(
+#             name, lambda x=image_dir, y=gt_dir: load_sem_seg(y, x, gt_ext="png", image_ext="jpg")
+#         )
+#         MetadataCatalog.get(name).set(
+#             image_root=image_dir,
+#             sem_seg_root=gt_dir,
+#             evaluator_type="sem_seg",
+#             ignore_label=255,
+#             **meta,
+#         )
 
 
 _root = os.getenv("DETECTRON2_DATASETS", "datasets")
