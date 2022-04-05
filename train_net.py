@@ -258,13 +258,15 @@ def setup(args):
     add_maskformer2_config(cfg)
     cfg.merge_from_file(args.config_file)
     cfg.merge_from_list(args.opts)
-    cfg.OUTPUT_DIR = "./logs/"
+    cfg.OUTPUT_DIR = "./drive/MyDrive/Mask2former"
     cfg.MIN_SIZE_TRAIN=(490,)
     cfg.SOLVER.CHECKPOINT_PERIOD=5000
     cfg.SOLVER.GAMMA = 0.8
     cfg.DATASETS.TRAIN = ("coco_2017_train_stuff_10k_sem_seg",)
     cfg.DATASETS.TEST = ("coco_2017_test_stuff_10k_sem_seg",)
     cfg.MODEL.ROI_HEADS.NUM_CLASSES = 323
+    cfg.SOLVER.STEPS = (10000,)
+    cfg.TEST.EVAL_PERIOD = 10000
     cfg.freeze()
     default_setup(cfg, args)
     # Setup logger for "mask_former" module
