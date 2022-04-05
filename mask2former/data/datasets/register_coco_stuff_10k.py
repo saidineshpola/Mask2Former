@@ -201,10 +201,10 @@ def register_all_coco_stuff_10k(root):
     train_annotations_path = '/content/data/train/new_ann.json'
     train_images_path = '/content/data/train/images'
 
-    val_annotations_path = 'data/val/new_ann.json'
-    val_images_path = 'data/val/images'
+    val_annotations_path = '/content/data/val/new_ann.json'
+    val_images_path = '/content/data/val/images'
     register_coco_instances("training_dataset", {},train_annotations_path, train_images_path)
-    register_coco_instances("validation_dataset", {},val_annotations_path, VAL_IMAGE_DIRECTIORY)
+    register_coco_instances("validation_dataset", {},val_annotations_path, val_images_path)
 
     MetadataCatalog.get("training_dataset")
     DatasetCatalog.get("training_dataset")
