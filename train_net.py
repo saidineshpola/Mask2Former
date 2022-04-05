@@ -21,6 +21,10 @@ from collections import OrderedDict
 from typing import Any, Dict, List, Set
 
 import torch
+from detectron2.engine import DefaultTrainer
+from detectron2.data import build_detection_test_loader, build_detection_train_loader
+from detectron2.evaluation import COCOEvaluator
+from detectron2.engine import BestCheckpointer
 
 import detectron2.utils.comm as comm
 from detectron2.checkpoint import DetectionCheckpointer
@@ -33,14 +37,14 @@ from detectron2.engine import (
     launch,
 )
 from detectron2.evaluation import (
-#     CityscapesInstanceEvaluator,
-#     CityscapesSemSegEvaluator,
-     COCOEvaluator,
-#     COCOPanopticEvaluator,
-     DatasetEvaluators,
-#     LVISEvaluator,
-#     SemSegEvaluator,
-#     verify_results,
+    CityscapesInstanceEvaluator,
+    CityscapesSemSegEvaluator,
+    COCOEvaluator,
+    COCOPanopticEvaluator,
+    DatasetEvaluators,
+    LVISEvaluator,
+    SemSegEvaluator,
+    verify_results,
 )
 from detectron2.projects.deeplab import add_deeplab_config, build_lr_scheduler
 from detectron2.solver.build import maybe_add_gradient_clipping
@@ -49,13 +53,11 @@ from detectron2.utils.logger import setup_logger
 # MaskFormer
 from mask2former import (
     COCOInstanceNewBaselineDatasetMapper,
-#     COCOPanopticNewBaselineDatasetMapper,
-     InstanceSegEvaluator,
-     MaskFormerInstanceDatasetMapper,
-#     MaskFormerPanopticDatasetMapper,
-#     MaskFormerSemanticDatasetMapper,
-#     SemanticSegmentorWithTTA,
-#     add_maskformer2_config,
+    COCOPanopticNewBaselineDatasetMapper,
+    InstanceSegEvaluator,
+    MaskFormerInstanceDatasetMapper,
+    SemanticSegmentorWithTTA,
+    add_maskformer2_config,
 )
 
 
@@ -78,7 +80,7 @@ class Trainer(DefaultTrainer):
         evaluator_list = []
         evaluator_type = MetadataCatalog.get(dataset_name).evaluator_type
         # semantic segmentation
-        if evaluator_type in ["sem_seg", "ade20k_panoptic_seg"]:
+        if evaluator_type in ["sem_seg"]: # , "ade20k_panoptic_seg"]:
             evaluator_list.append(
                 SemSegEvaluator(
                     dataset_name,
@@ -103,48 +105,6 @@ class Trainer(DefaultTrainer):
             evaluator_list.append(COCOEvaluator(dataset_name, output_dir=output_folder))
         if evaluator_type == "coco_panoptic_seg" and cfg.MODEL.MASK_FORMER.TEST.SEMANTIC_ON:
             evaluator_list.append(SemSegEvaluator(dataset_name, distributed=True, output_dir=output_folder))
-        # Mapillary Vistas
-        if evaluator_type == "mapillary_vistas_panoptic_seg" and cfg.MODEL.MASK_FORMER.TEST.INSTANCE_ON:
-            evaluator_list.append(InstanceSegEvaluator(dataset_name, output_dir=output_folder))
-        if evaluator_type == "mapillary_vistas_panoptic_seg" and cfg.MODEL.MASK_FORMER.TEST.SEMANTIC_ON:
-            evaluator_list.append(SemSegEvaluator(dataset_name, distributed=True, output_dir=output_folder))
-        # Cityscapes
-        if evaluator_type == "cityscapes_instance":
-            assert (
-                torch.cuda.device_count() > comm.get_rank()
-            ), "CityscapesEvaluator currently do not work with multiple machines."
-            return CityscapesInstanceEvaluator(dataset_name)
-        if evaluator_type == "cityscapes_sem_seg":
-            assert (
-                torch.cuda.device_count() > comm.get_rank()
-            ), "CityscapesEvaluator currently do not work with multiple machines."
-            return CityscapesSemSegEvaluator(dataset_name)
-        if evaluator_type == "cityscapes_panoptic_seg":
-            if cfg.MODEL.MASK_FORMER.TEST.SEMANTIC_ON:
-                assert (
-                    torch.cuda.device_count() > comm.get_rank()
-                ), "CityscapesEvaluator currently do not work with multiple machines."
-                evaluator_list.append(CityscapesSemSegEvaluator(dataset_name))
-            if cfg.MODEL.MASK_FORMER.TEST.INSTANCE_ON:
-                assert (
-                    torch.cuda.device_count() > comm.get_rank()
-                ), "CityscapesEvaluator currently do not work with multiple machines."
-                evaluator_list.append(CityscapesInstanceEvaluator(dataset_name))
-        # ADE20K
-        if evaluator_type == "ade20k_panoptic_seg" and cfg.MODEL.MASK_FORMER.TEST.INSTANCE_ON:
-            evaluator_list.append(InstanceSegEvaluator(dataset_name, output_dir=output_folder))
-        # LVIS
-        if evaluator_type == "lvis":
-            return LVISEvaluator(dataset_name, output_dir=output_folder)
-        if len(evaluator_list) == 0:
-            raise NotImplementedError(
-                "no Evaluator for the dataset {} with the type {}".format(
-                    dataset_name, evaluator_type
-                )
-            )
-        elif len(evaluator_list) == 1:
-            return evaluator_list[0]
-        return DatasetEvaluators(evaluator_list)
 
     @classmethod
     def build_train_loader(cls, cfg):
@@ -153,9 +113,6 @@ class Trainer(DefaultTrainer):
             mapper = MaskFormerSemanticDatasetMapper(cfg, True)
             return build_detection_train_loader(cfg, mapper=mapper)
         # Panoptic segmentation dataset mapper
-        elif cfg.INPUT.DATASET_MAPPER_NAME == "mask_former_panoptic":
-            mapper = MaskFormerPanopticDatasetMapper(cfg, True)
-            return build_detection_train_loader(cfg, mapper=mapper)
         # Instance segmentation dataset mapper
         elif cfg.INPUT.DATASET_MAPPER_NAME == "mask_former_instance":
             mapper = MaskFormerInstanceDatasetMapper(cfg, True)
@@ -165,9 +122,6 @@ class Trainer(DefaultTrainer):
             mapper = COCOInstanceNewBaselineDatasetMapper(cfg, True)
             return build_detection_train_loader(cfg, mapper=mapper)
         # coco panoptic segmentation lsj new baseline
-        elif cfg.INPUT.DATASET_MAPPER_NAME == "coco_panoptic_lsj":
-            mapper = COCOPanopticNewBaselineDatasetMapper(cfg, True)
-            return build_detection_train_loader(cfg, mapper=mapper)
         else:
             mapper = None
             return build_detection_train_loader(cfg, mapper=mapper)
@@ -276,6 +230,22 @@ class Trainer(DefaultTrainer):
         res = cls.test(cfg, model, evaluators)
         res = OrderedDict({k + "_TTA": v for k, v in res.items()})
         return res
+    #########################################################BestCheckPointhook################################
+    def build_hooks(self):
+
+        # copy of cfg
+        cfg = self.cfg.clone()
+
+        # build the original model hooks
+        hooks = super().build_hooks()
+
+        # add the best checkpointer hook
+        hooks.insert(-1, BestCheckpointer(cfg.TEST.EVAL_PERIOD, 
+                                         DetectionCheckpointer(self.model, cfg.OUTPUT_DIR),
+                                         "segm/AP",
+                                         "max",
+                                         ))
+        return hooks
 
 
 def setup(args):
@@ -288,6 +258,13 @@ def setup(args):
     add_maskformer2_config(cfg)
     cfg.merge_from_file(args.config_file)
     cfg.merge_from_list(args.opts)
+    cfg.OUTPUT_DIR = "./logs/"
+    cfg.MIN_SIZE_TRAIN=(490,)
+    cfg.SOLVER.CHECKPOINT_PERIOD=5000
+    cfg.SOLVER.GAMMA = 0.8
+    cfg.DATASETS.TRAIN = ("coco_2017_train_stuff_10k_sem_seg",)
+    cfg.DATASETS.TEST = ("coco_2017_test_stuff_10k_sem_seg",)
+    cfg.MODEL.ROI_HEADS.NUM_CLASSES = 323
     cfg.freeze()
     default_setup(cfg, args)
     # Setup logger for "mask_former" module
@@ -309,7 +286,6 @@ def main(args):
         if comm.is_main_process():
             verify_results(cfg, res)
         return res
-
     trainer = Trainer(cfg)
     trainer.resume_or_load(resume=args.resume)
     return trainer.train()
