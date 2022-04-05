@@ -33,14 +33,14 @@ from detectron2.engine import (
     launch,
 )
 from detectron2.evaluation import (
-    CityscapesInstanceEvaluator,
-    CityscapesSemSegEvaluator,
-    COCOEvaluator,
-    COCOPanopticEvaluator,
-    DatasetEvaluators,
-    LVISEvaluator,
-    SemSegEvaluator,
-    verify_results,
+#     CityscapesInstanceEvaluator,
+#     CityscapesSemSegEvaluator,
+     COCOEvaluator,
+#     COCOPanopticEvaluator,
+     DatasetEvaluators,
+#     LVISEvaluator,
+#     SemSegEvaluator,
+#     verify_results,
 )
 from detectron2.projects.deeplab import add_deeplab_config, build_lr_scheduler
 from detectron2.solver.build import maybe_add_gradient_clipping
@@ -49,13 +49,13 @@ from detectron2.utils.logger import setup_logger
 # MaskFormer
 from mask2former import (
     COCOInstanceNewBaselineDatasetMapper,
-    COCOPanopticNewBaselineDatasetMapper,
-    InstanceSegEvaluator,
-    MaskFormerInstanceDatasetMapper,
-    MaskFormerPanopticDatasetMapper,
-    MaskFormerSemanticDatasetMapper,
-    SemanticSegmentorWithTTA,
-    add_maskformer2_config,
+#     COCOPanopticNewBaselineDatasetMapper,
+     InstanceSegEvaluator,
+     MaskFormerInstanceDatasetMapper,
+#     MaskFormerPanopticDatasetMapper,
+#     MaskFormerSemanticDatasetMapper,
+#     SemanticSegmentorWithTTA,
+#     add_maskformer2_config,
 )
 
 
