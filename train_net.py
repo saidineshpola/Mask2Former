@@ -258,8 +258,8 @@ def setup(args):
     add_maskformer2_config(cfg)
     cfg.merge_from_file(args.config_file)
     cfg.merge_from_list(args.opts)
-    cfg.OUTPUT_DIR = "./drive/MyDrive/Mask2former"
-    cfg.MIN_SIZE_TRAIN=(490,)
+    cfg.OUTPUT_DIR = "/content/drive/MyDrive/mask2former"
+    cfg.MIN_SIZE_TRAIN=(900,)
     cfg.SOLVER.CHECKPOINT_PERIOD=5000
     cfg.SOLVER.GAMMA = 0.8
     cfg.DATASETS.TRAIN = ("training_dataset",)
