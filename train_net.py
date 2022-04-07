@@ -268,6 +268,7 @@ def setup(args):
     cfg.SOLVER.STEPS = (10000,)
     cfg.TEST.EVAL_PERIOD = 10000
     cfg.MODEL.WEIGHTS='base_m2f.pkl'
+    cfg.MODEL.RETINANET.NUM_CLASSES=323
     cfg.freeze()
     default_setup(cfg, args)
     # Setup logger for "mask_former" module
