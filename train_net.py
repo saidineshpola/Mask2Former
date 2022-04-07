@@ -80,17 +80,17 @@ class Trainer(DefaultTrainer):
         evaluator_list = []
         evaluator_type = MetadataCatalog.get(dataset_name).evaluator_type
         # semantic segmentation
-        if evaluator_type in ["sem_seg"]: # , "ade20k_panoptic_seg"]:
-            evaluator_list.append(
-                SemSegEvaluator(
-                    dataset_name,
-                    distributed=True,
-                    output_dir=output_folder,
-                )
-            )
+#         if evaluator_type in ["sem_seg"]: # , "ade20k_panoptic_seg"]:
+#             evaluator_list.append(
+#                 SemSegEvaluator(
+#                     dataset_name,
+#                     distributed=True,
+#                     output_dir=output_folder,
+#                 )
+#             )
         # instance segmentation
-        if evaluator_type == "coco":
-            evaluator_list.append(COCOEvaluator(dataset_name, output_dir=output_folder))
+        
+        evaluator_list.append(COCOEvaluator(dataset_name, output_dir=output_folder))
         # panoptic segmentation
         if evaluator_type in [
             "coco_panoptic_seg",
