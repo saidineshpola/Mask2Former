@@ -267,7 +267,7 @@ def setup(args):
     cfg.MODEL.ROI_HEADS.NUM_CLASSES = 323
     cfg.SOLVER.STEPS = (10000,)
     cfg.TEST.EVAL_PERIOD = 10000
-    cfg.MODEL.WEIGHTS='base_m2f.pkl'
+    cfg.MODEL.WEIGHTS='/content/drive/MyDrive/mask2former/model_0019999.pth'
     cfg.MODEL.RETINANET.NUM_CLASSES=323
     cfg.freeze()
     default_setup(cfg, args)
