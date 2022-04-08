@@ -260,6 +260,7 @@ def setup(args):
     cfg.merge_from_list(args.opts)
     cfg.OUTPUT_DIR = "/content/drive/MyDrive/mask2former"
     cfg.MIN_SIZE_TRAIN=(900,)
+    cf.MAX_SIZE_TRAIN=1100
     cfg.SOLVER.CHECKPOINT_PERIOD=5000
     cfg.SOLVER.GAMMA = 0.8
     cfg.DATASETS.TRAIN = ("training_dataset",)
