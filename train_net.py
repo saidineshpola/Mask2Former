@@ -264,6 +264,8 @@ def setup(args):
 #     cfg.INPUT.MIN_SCALE=0.1
 #     cfg.INPUT.MAN_SCALE=2.0
     cfg.SOLVER.CHECKPOINT_PERIOD=5000
+    cfg.SOLVER.OPTIMIZER="SGD"
+    cfg.LR_SCHEDULER_NAME = "WarmupCosineLR"
     cfg.SOLVER.GAMMA = 0.8
     cfg.DATASETS.TRAIN = ("training_dataset",)
     cfg.DATASETS.TEST = ("validation_dataset",)
