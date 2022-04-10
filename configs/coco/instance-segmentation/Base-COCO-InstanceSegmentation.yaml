@@ -38,7 +38,7 @@ INPUT:
   MIN_SCALE: 0.1
   MAX_SCALE: 2.0
   FORMAT: "RGB"
-  DATASET_MAPPER_NAME: "coco_instance_lsj"
+  DATASET_MAPPER_NAME: "coco_instance_lsj"  # or use maskformerMapper
 TEST:
   EVAL_PERIOD: 5000
 DATALOADER:
