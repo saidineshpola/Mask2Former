@@ -274,6 +274,7 @@ def setup(args):
     cfg.TEST.EVAL_PERIOD = 10000
     cfg.MODEL.WEIGHTS='/content/drive/MyDrive/mask2former/model_0019999.pth'
     cfg.MODEL.RETINANET.NUM_CLASSES=323
+    cfg.MODEL.SEM_SEG_HEADIGNORE_VALUES=323
     cfg.freeze()
     default_setup(cfg, args)
     # Setup logger for "mask_former" module
